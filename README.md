@@ -4,7 +4,7 @@ A Claude Code skill that turns coding sessions into narrated videos for YouTube 
 
 <p align="center">
   <img src="https://img.shields.io/badge/Claude_Code-skill-D4A843?style=flat-square" alt="Claude Code Skill">
-  <img src="https://img.shields.io/badge/output-MP4_via_Playwright-5CB87A?style=flat-square" alt="MP4 Output">
+  <img src="https://img.shields.io/badge/output-HTML_film_%2B_MP4_export-4ADE80?style=flat-square" alt="HTML Film and MP4 Export">
   <img src="https://img.shields.io/badge/narration-ElevenLabs-9CA3AF?style=flat-square" alt="ElevenLabs Narration">
 </p>
 
@@ -51,8 +51,10 @@ cp -r . ~/.claude/skills/study-film/
 
 ```
 Session → /study → HTML film + narration script → narration audio lock → review page
+                                          ↑                              ↓
+                                   retime scenes if needed      silent capture / fallback capture
                                                                      ↓
-YouTube ← title/thumbnail/captions ← MP4 mux ← silent capture ← ?autoplay
+YouTube ← title/thumbnail/captions ← MP4 mux ← silent `?autoplay`
 ```
 
 ### Voice Narration
@@ -60,6 +62,7 @@ YouTube ← title/thumbnail/captions ← MP4 mux ← silent capture ← ?autopla
 The skill generates a narration script from the session. For the actual voice, [ElevenLabs](https://try.elevenlabs.io/ots0dbiulx3y) produces the most natural results. Their `eleven_v3` model with a narrator-style voice works well for this format. Use ellipses (`...`) for natural pauses — v3 handles them better than SSML break tags.
 
 Any TTS service works. The narration is a separate MP3 that gets muxed into the final video with ffmpeg.
+Keep the narration file next to the exported film as `narration.mp3` unless you intentionally change the template path.
 
 ### Recording
 
@@ -81,6 +84,7 @@ const { chromium } = require('playwright');
   });
   const page = await context.newPage();
   await page.goto('file:///path/to/index.html?autoplay');
+  // DURATION_MS = ffprobe narration.mp3; narration is the fixed clock.
   await page.waitForTimeout(DURATION_MS + 5000);
   await context.close();
   await browser.close();
@@ -191,6 +195,7 @@ study-film/
   SKILL.md              # Skill prompt (Claude Code reads this)
   references/
     template.html       # Base HTML template with styles, sounds, and player
+    production-checklist.md
 ```
 
 ## License

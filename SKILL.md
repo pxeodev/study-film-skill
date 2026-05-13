@@ -191,9 +191,9 @@ Use the template at `references/template.html` as the base. Replace:
 
 Before capture, review the whole film for internal contradictions.
 
-- Terms: signal vs filter vs trade vs carry must stay distinct
-- Numbers: dates, percentages, profitable-trade counts, drawdowns, and rule values must match across scenes
-- Policy: stop/hold/cooldown rules must not change wording scene-to-scene
+- Terms: roles must stay distinct (signal vs filter vs action, or any equivalent domain language)
+- Numbers: dates, percentages, counts, durations, thresholds, and rule values must match across scenes
+- Policy: rule wording must not change scene-to-scene
 - Provenance: if an entry date or source is not system-of-record verified, soften the claim
 - Packaging: thumbnail/title should emphasize the clearest conflict, not a side detail
 
@@ -254,7 +254,6 @@ Add this at the very top of `<body>`, BEFORE the start screen div:
 And at the bottom of your script, after `startFilm()`:
 ```javascript
 if (window.location.search.includes('autoplay')) {
-  document.getElementById('startScreen').style.display = 'none';
   setTimeout(function() { running = true; nextScene(); }, 500);
 }
 ```
@@ -293,6 +292,7 @@ const { chromium } = require('playwright');
   });
   const page = await context.newPage();
   await page.goto('file:///path/to/film/index.html?autoplay');
+  // DURATION_MS = ffprobe narration.mp3; narration is the fixed clock.
   await page.waitForTimeout(DURATION_MS + 5000);
   await context.close();
   await browser.close();
@@ -327,7 +327,7 @@ ffmpeg -y -i video/recording.webm -i narration.mp3 \
 - Total scene durations should match the narration closely enough that the last visual beat lands without dead air
 - If narration strip text duplicates what's on screen, clear or shorten it
 
-### 8. Thumbnail and packaging
+### 8. Packaging
 
 Render at YouTube spec (1280x720) with Playwright:
 ```bash

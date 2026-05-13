@@ -25,7 +25,7 @@
   /* Terminal blocks — surface step on canonical surface, no parallel "cold" palette */
   .term {
     background: #141414; border-radius: 6px;
-    width: 100%; max-width: 960px; overflow: hidden;
+    width: 85vw; max-width: 1400px; overflow: hidden;
     position: absolute; opacity: 0; transition: opacity 0.6s ease;
     pointer-events: none;
   }
@@ -37,7 +37,7 @@
   }
   .term-dot { width: 10px; height: 10px; border-radius: 50%; }
   .term-title { font-family: 'Geist Mono', monospace; font-size: 12px; color: #999999; margin-left: 12px; }
-  .term-body { padding: 24px 28px; font-family: 'Geist Mono', monospace; font-size: 15px; line-height: 2.2; }
+  .term-body { padding: 24px 28px; font-family: 'Geist Mono', monospace; font-size: clamp(16px, 1.6vw, 24px); line-height: 2.2; }
   .term-line { opacity: 0; transform: translateY(4px); transition: opacity 0.3s, transform 0.3s; }
   .term-line.show { opacity: 1; transform: translateY(0); }
 
@@ -176,11 +176,14 @@
 <script>
 var snd = new Snd(); snd.load(Snd.KITS.SND01);
 var audioEnabled = false;
+// Keep the narration file next to the film export unless you intentionally
+// change this path.
 var narrationTrack = new Audio('narration.mp3');
 narrationTrack.preload = 'auto';
 
 var scenes = [
-  // Replace with scene config
+  // Replace with scene config. Total scene runtime should closely match
+  // narration.mp3 because the narration is the fixed clock.
 ];
 
 var current = -1, running = false;

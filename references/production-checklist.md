@@ -25,9 +25,9 @@ before you record anything.
 
 Scan the full film for:
 
-- term drift: signal vs filter vs carry vs trade
-- number drift: percentages, profitable counts, dates, hold windows
-- policy drift: stop, cooldown, and max-hold values
+- term drift: roles changing meaning between scenes
+- number drift: percentages, counts, dates, durations, thresholds
+- policy drift: rules changing meaning or wording
 - provenance drift: statements stronger than the evidence supports
 - packaging drift: title/thumbnail selling a side point instead of the core conflict
 
@@ -52,7 +52,8 @@ If headless timing drifts because:
 then record the real browser in the foreground and capture video only. Mux the
 locked narration afterward.
 
-For one-shot final masters, real-browser capture is acceptable.
+For one-shot final masters, real-browser capture is acceptable. QuickTime,
+the OS screen recorder, or another foreground recorder all qualify.
 
 ## 6. Thumbnail rules
 
