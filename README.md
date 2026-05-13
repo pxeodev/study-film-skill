@@ -14,12 +14,13 @@ After a coding session, say `/study` or "make a film from this session." The ski
 
 - **Terminal animations** — line-by-line reveals matching Claude Code's tool calls
 - **AI narration** — script generated from session, voiced via [ElevenLabs](https://try.elevenlabs.io/ots0dbiulx3y)
-- **1080p export** — recorded headless via Playwright, muxed with ffmpeg
+- **Audio-locked pacing** — scene timing is tuned to the actual narration, not rough word counts
+- **1080p export** — recorded headless via Playwright when stable, or via real-browser fallback
 - **Sound design** — transition, typing, caution, and celebration sounds via [SND](https://github.com/nicklasserra/snd-lib)
-- **Dual palette** — warm editorial frame, cold terminal interior
-- **YouTube-ready** — 1920x1080, thumbnail generator, metadata template
+- **Canon palette** — single editorial palette on a three-step surface ladder
+- **YouTube-ready** — 1920x1080, thumbnail generator, captions, and metadata template
 
-Output pipeline: HTML film → Playwright recording → ffmpeg mux with narration → MP4 upload.
+Output pipeline: HTML film → narration lock → browser review → silent capture → ffmpeg mux → captions + thumbnail → upload.
 
 ## Example
 
@@ -38,18 +39,20 @@ cp -r . ~/.claude/skills/study-film/
 
 # Export to video
 # 1. Generate narration (ElevenLabs or any TTS)
-# 2. Record with Playwright at 1080p
-# 3. Mux audio + video with ffmpeg
-# See SKILL.md "YouTube Recording Mode" for full pipeline
+# 2. Pace the HTML to the actual audio
+# 3. Review in browser with narration on
+# 4. Capture the silent ?autoplay version
+# 5. Mux audio + video with ffmpeg
+# 6. Ship thumbnail + captions
+# See SKILL.md and references/production-checklist.md
 ```
 
 ## Pipeline Overview
 
 ```
-Session → /study → HTML film → ?autoplay → Playwright 1080p → ffmpeg mux → MP4 → YouTube
-                                    ↑                              ↑
-                               hides web UI                  adds narration
-                               auto-starts                   from ElevenLabs
+Session → /study → HTML film + narration script → narration audio lock → review page
+                                                                     ↓
+YouTube ← title/thumbnail/captions ← MP4 mux ← silent capture ← ?autoplay
 ```
 
 ### Voice Narration
@@ -60,10 +63,11 @@ Any TTS service works. The narration is a separate MP3 that gets muxed into the 
 
 ### Recording
 
-Playwright records the film headless at 1920x1080. The `?autoplay` URL parameter:
+Playwright records the film headless at 1920x1080 when the page keeps time correctly. The `?autoplay` URL parameter:
 - Hides the start screen, voice toggle, REC badge, and scene counter
 - Auto-starts the film without user interaction
 - Keeps animated elements (kill counters, reveals) intact
+- Stays silent so the clean narration track is added in post
 
 ```bash
 # Record
@@ -83,11 +87,16 @@ const { chromium } = require('playwright');
 })();
 "
 
-# Mux with narration (trim 1s black frame from autoplay startup)
-ffmpeg -y -ss 1 -i video/recording.webm -i narration.mp3 \
+# Mux with narration
+ffmpeg -y -i video/recording.webm -i narration.mp3 \
+  -map 0:v -map 1:a \
   -c:v libx264 -crf 16 -preset slow -c:a aac -b:a 192k \
-  -map 0:v -map 1:a -shortest output.mp4
+  -shortest output.mp4
 ```
+
+If headless playback drifts or drops timing-sensitive beats, record the real
+browser in the foreground and capture video only. Then mux the locked narration
+track afterward.
 
 ### Thumbnails
 
@@ -106,32 +115,43 @@ const { chromium } = require('playwright');
 "
 ```
 
+Check the export at both `1280x720` and `320x180`. If the headline gets
+cropped or the frame reads like a wall of text, simplify it.
+
+## Production Checklist
+
+For the workflow proven out on Episode 3, see
+`references/production-checklist.md`.
+
 ## Customization
 
 ### Colors
 
-Two palettes. Edit CSS variables in `references/template.html`:
+The film uses the Shumi study-film canon (single locked palette, no
+parallel "cold terminal" sub-palette). To customize for a different
+brand, edit the canon tokens in `references/template.html` and
+`SKILL.md` §4 together — they must stay in sync.
 
-**Frame** (warm surround):
 ```css
-background: #262626;    /* swap for your bg */
-color: #F9FAFB;         /* primary text */
-/* accent: #D4A843 (gold highlights) */
-/* red: #E84749 (corrections) */
+/* Canon palette */
+background: #0A0A0A;    /* surface */
+color: #E0E0E0;         /* text on dark */
+/* terracotta: #D4574A — primary editorial accent */
+/* failure:    #EF4444 — failure / error / correction */
+/* gold:       #D4A843 — warning / progress */
+/* success:    #4ADE80 — pass-state */
+/* axis:       #999999 — paths, captions, output */
+
+/* Surface ladder (three steps only) */
+/* #0A0A0A page → #141414 panel → #1E1E22 nested */
 ```
 
-**Terminal** (cold interior):
-```css
-background: #0C0C0E;    /* terminal bg */
-/* prompt: #22D3EE (cyan) */
-/* path: #60A5FA (blue) */
-/* caret: #FACC15 (yellow) */
-/* tool: #A78BFA (purple) */
-```
+Hard rules: no borders or shadows around content panels, no parallel
+terminal palette, glow only on small marks at ≤ 0.3 opacity.
 
 ### Fonts
 
-Default: [DM Sans](https://fonts.google.com/specimen/DM+Sans) + [Space Mono](https://fonts.google.com/specimen/Space+Mono) via Google Fonts CDN.
+Default: [DM Sans](https://fonts.google.com/specimen/DM+Sans) + [Geist Mono](https://fonts.google.com/specimen/Geist+Mono) via Google Fonts CDN.
 
 ### Sounds
 

@@ -8,11 +8,12 @@ Use this skill when the user says "make a study", "generate a film", "create a v
 
 Turns a Claude Code session into a publishable video:
 
-1. **Extract** the narrative arc from the session (task → corrections → discoveries → ship)
+1. **Extract** the narrative arc and the factual claims from the session
 2. **Generate** a self-contained HTML film with terminal animations, timed scenes, and sound
-3. **Narrate** with AI voice ([ElevenLabs](https://try.elevenlabs.io/ots0dbiulx3y) recommended for natural delivery)
-4. **Record** at 1080p via Playwright (headless, no manual screen capture)
-5. **Export** as MP4 with narration muxed in — ready to upload to YouTube
+3. **Lock** a narration script and audio take before final timing
+4. **Pace** the visual cut to the actual narration, not word-count estimates
+5. **Review** on the normal page with audio, then capture the silent `?autoplay` cut
+6. **Export** as MP4, captions, and thumbnail assets for upload
 
 The HTML film works standalone in any browser (with keyboard navigation and sound), AND exports cleanly to video via the `?autoplay` recording mode.
 
@@ -25,6 +26,7 @@ Read the conversation history from the current session. Identify:
 - **Corrections**: where did the AI get it wrong and the user corrected it? (These are the most important moments — they create tension)
 - **Discoveries**: unexpected findings, scans, data that appeared
 - **The ship**: what was committed/pushed/deployed at the end?
+- **Claims**: dates, percentages, counts, policy values, and terminology that must stay internally consistent
 
 Structure into acts: SETUP → INCIDENT → CORRECTIONS → RECOVERY → SHIP
 
@@ -51,6 +53,22 @@ Each scene needs:
   sound: 'caution',         // caution | notification | celebration
 }
 ```
+
+### 2b. Storyboard discipline
+
+- One idea per scene. If a viewer needs more than 1-2 seconds to parse a line, split it.
+- Avoid metadata kickers that read like logs. Top lines should frame, not explain.
+- Comparison scenes should have one dominant contrast (`-127%` vs `SKIPPED`, `intuition` vs `method`) and minimal supporting copy.
+- If the narration already says the sentence, reduce or remove duplicate on-screen text.
+
+### 2c. Lock narration before timing
+
+Write the narration as a separate script, generate the audio, and treat that audio as the fixed clock.
+
+- Do not finalize scene `dur` values from rough estimates alone.
+- Review on the normal page with narration on.
+- Use `?autoplay` only for silent capture after the pacing already feels right.
+- If a long section drifts, cut the scene on the spoken cue, not on a guessed midpoint.
 
 ### 3. Terminal line formatting
 
@@ -80,38 +98,70 @@ Each scene needs:
 
 ### 4. Color tokens
 
-The film uses two palettes: a warm frame and a cold terminal interior.
+The film uses the Shumi study-film canon. There is no parallel "cold
+terminal" palette — terminals live on the canonical surface ladder
+and use canonical tokens. Source of truth:
+`~/projects/studies/v2/site/CANON.md`. Executable gate:
+`~/projects/studies/scripts/film-palette-scan.sh`.
 
-**Frame (warm, editorial):**
+**Palette (canon — locked):**
 ```css
---bg:         #262626   /* neutral gray */
---text:       #F9FAFB   /* near-white */
---text-sec:   #9CA3AF   /* secondary prose */
---text-muted: #6B7280   /* labels */
---border:     #404040   /* separator */
---accent:     #D4A843   /* gold — highlights */
---red:        #E84749   /* corrections, errors */
+--terracotta:  #D4574A   /* primary editorial accent — prompts, carets, tool calls, hi */
+--failure:     #EF4444   /* failure / error / correction red */
+--gold:        #D4A843   /* warning / open-issue / progress accent */
+--success:     #4ADE80   /* success / pass-state */
+--axis:        #999999   /* axes, captions, metadata, paths, output, comments */
+--text:        #E0E0E0   /* body text, command output */
+--surface:     #0A0A0A   /* page background */
+--logo:        #E74C3C   /* bloom + wordmark only — never UI */
 ```
 
-**Terminal blocks (cold, precise):**
+**Surface ladder (allowed by exception, three steps only):**
 ```css
---term-bg:    #0C0C0E   /* darkest surface */
---term-border:#1E1E22   /* hard cut */
---prompt:     #22D3EE   /* cyan — prompt name */
---path:       #60A5FA   /* blue — directory */
---caret:      #FACC15   /* yellow — ❯ */
---tool:       #A78BFA   /* purple — tool calls */
---ok:         #5CB87A   /* green — success */
---red:        #E84749   /* red — errors */
---warn:       #D4A843   /* gold — warnings */
---out:        #6B7280   /* gray — output */
---dim:        #333333   /* dark — comments */
+--surface-0: #0A0A0A   /* page */
+--surface-1: #141414   /* panel, terminal body, narration area */
+--surface-2: #1E1E22   /* nested element, terminal title bar */
 ```
 
-**Fonts:**
-- Frame: DM Sans (titles, narration) + Space Mono (labels, counters)
-- Terminal blocks: Space Mono only
-- Google Fonts URL: `DM+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700`
+**Terminal-block token mapping (no parallel palette):**
+```css
+.t-prompt  { color: #D4574A; }   /* terracotta — prompt name */
+.t-path    { color: #999999; }   /* axis gray — directory */
+.t-caret   { color: #D4574A; }   /* terracotta — ❯ */
+.t-tool    { color: #D4574A; }   /* terracotta — tool calls */
+.t-cmd     { color: #E0E0E0; }   /* text — command body */
+.t-out     { color: #999999; }   /* axis — stdout */
+.t-comment { color: #999999; }   /* axis — italics */
+.t-ok      { color: #4ADE80; }   /* success */
+.t-red     { color: #EF4444; }   /* failure */
+.t-warn    { color: #D4A843; }   /* warning */
+.t-dim     { color: #999999; }   /* dim */
+```
+
+**Hard rules:**
+- Logo red `#E74C3C` and failure red `#EF4444` never share a frame.
+  Logo red is allowed only on the end card (physarum bloom + wordmark).
+- No `#E84749`, `#5CB87A`, `#22D3EE`, `#60A5FA`, `#FACC15`, `#A78BFA` —
+  these were drift in earlier films and are now scan-flagged.
+- No borders or shadows around content panels. Use surface steps
+  (`#0A0A0A` → `#141414` → `#1E1E22`) for hierarchy.
+- Glow on small marks (signal dots, gate cells) is allowed at
+  `0 0 12px` ≤ 0.3 opacity. Glow on panels is forbidden.
+- Background gradients on the surface itself are allowed at ≤ 0.15
+  opacity. They're surface variation, not depth.
+
+**Fonts (canon — locked):**
+- DM Sans — editorial text, headers, narration, panel titles, body copy.
+- Geist Mono — all monospace: terminals, kickers, axes, code, labels,
+  counters, timestamps.
+- Google Fonts URL: `DM+Sans:wght@400;500;600;700&family=Geist+Mono:wght@400;500;700`
+- No Space Mono. No system mono fallbacks. No JetBrains.
+
+**Motion — character-stepped reveals:**
+- Allowed only as terminal output: Geist Mono on dark surface,
+  terracotta cursor, no UI chrome. Step cadence 30–80ms per character.
+- Not allowed for narration overlays, panel titles, or quoted text
+  in DM Sans. Quoted text uses full-quote fade-in.
 
 ### 5. Sound mapping
 
@@ -137,11 +187,31 @@ Use the template at `references/template.html` as the base. Replace:
 - The `scenes` array in the script
 - Any session-specific data (repo names, branch names, commit hashes)
 
-### 7. Output location
+### 7. Contradiction pass
+
+Before capture, review the whole film for internal contradictions.
+
+- Terms: signal vs filter vs trade vs carry must stay distinct
+- Numbers: dates, percentages, profitable-trade counts, drawdowns, and rule values must match across scenes
+- Policy: stop/hold/cooldown rules must not change wording scene-to-scene
+- Provenance: if an entry date or source is not system-of-record verified, soften the claim
+- Packaging: thumbnail/title should emphasize the clearest conflict, not a side detail
+
+### 8. Output location
 
 Write the HTML file wherever the user specifies, or default to the current working directory.
 
-### 8. Privacy rules
+Optional YouTube deliverables:
+- `thumbnail.html`
+- `thumbnail.png`
+- `captions.en.srt`
+- `captions.en.vtt`
+- short description + pinned comment draft
+
+For the production checklist used on Episode 3, see
+`references/production-checklist.md`.
+
+### 9. Privacy rules
 
 - NEVER include actual env values, API keys, endpoints, or secrets
 - Redact with `████████████` blocks
@@ -168,7 +238,7 @@ When exporting a study film as a video for YouTube or social media, add `?autopl
 Add this CSS to your template — these elements are for browser interaction, not video:
 
 ```css
-html.autoplay .start { display: none !important; }
+html.autoplay .start-screen { display: none !important; }
 html.autoplay .audio-toggle { display: none !important; }
 html.autoplay .rec-badge { display: none !important; }
 html.autoplay .counter { display: none !important; }
@@ -189,7 +259,13 @@ if (window.location.search.includes('autoplay')) {
 }
 ```
 
-### 3. Text sizing for 1080p video
+### 3. Review mode vs capture mode
+
+- `index.html` (normal page): use this for the human pacing pass with narration on
+- `index.html?autoplay`: use this for the silent capture pass only
+- Do not judge timing from the silent capture URL alone
+
+### 4. Text sizing for 1080p video
 
 YouTube videos are viewed at various sizes. Minimum readable sizes for 1920x1080:
 
@@ -202,7 +278,9 @@ Badges:          font-size: clamp(14px, 1.4vw, 18px)
 Labels:          font-size: clamp(14px, 1.4vw, 18px)
 ```
 
-### 4. Record with Playwright
+### 5. Capture strategy
+
+Start with Playwright when the page keeps time correctly in headless mode.
 
 ```bash
 node -e "
@@ -222,27 +300,34 @@ const { chromium } = require('playwright');
 "
 ```
 
-### 5. Add narration audio
+If headless capture drifts because timers miss beats, long animations stall,
+or the browser deprioritizes work, switch to a real foreground browser capture
+(QuickTime or the OS screen recorder) and record video only. Then mux the
+locked narration in afterward.
+
+### 6. Add narration audio
 
 Use any TTS service to generate narration from your script. [ElevenLabs](https://try.elevenlabs.io/ots0dbiulx3y) produces the most natural results for this style of content.
 
 Mux video + audio with ffmpeg:
 ```bash
-# Trim 1s black frame from autoplay startup, add narration
-ffmpeg -y -ss 1 -i video/recording.webm -i narration.mp3 \
+# If the capture has a leading delay, trim or set -t explicitly.
+ffmpeg -y -i video/recording.webm -i narration.mp3 \
+  -map 0:v -map 1:a \
   -c:v libx264 -crf 16 -preset slow -c:a aac -b:a 192k \
-  -map 0:v -map 1:a -shortest output.mp4
+  -shortest output.mp4
 ```
 
-### 6. Narration sync tips
+### 7. Narration sync tips
 
-- Estimate scene durations from word count (~2.8 words/sec)
-- Verify with `ffmpeg -af silencedetect` on the narration audio
-- Manual spot-check: extract 3s clips at estimated transitions
-- Total scene durations should match narration ±5 seconds
-- If narration strip text duplicates what's on screen, clear it
+- Lock the narration file before final timing
+- Measure the actual narration duration with `ffprobe` or equivalent
+- Use `ffmpeg -af silencedetect` only as a rough aid, not the source of truth
+- If a long section drifts, transcribe the audio and move internal cuts to the spoken words
+- Total scene durations should match the narration closely enough that the last visual beat lands without dead air
+- If narration strip text duplicates what's on screen, clear or shorten it
 
-### 7. Thumbnail
+### 8. Thumbnail and packaging
 
 Render at YouTube spec (1280x720) with Playwright:
 ```bash
@@ -258,6 +343,18 @@ const { chromium } = require('playwright');
 })();
 "
 ```
+
+Rules:
+- Verify legibility at both `1280x720` and `320x180`
+- Prefer one dominant contrast over lots of explanatory text
+- Do not crop headline words at the export edge
+- If the workflow is the real hook, package the structure, not the niche detail
+
+Also ship:
+- captions (`.srt` and optionally `.vtt`)
+- a concise title
+- a short description
+- a pinned comment
 
 ## Keyboard Controls
 
