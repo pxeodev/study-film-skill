@@ -3,17 +3,17 @@
 ## Session Update (2026-05-13)
 
 Completed:
-- Revised the skill to match the Episode 3 production workflow instead of the older "generate narration, estimate timing, record headless" version.
-- Updated [`SKILL.md`](/Users/secure/projects/study-film-skill/SKILL.md) to add:
+- Revised the skill to match the current production workflow instead of the older "generate narration, estimate timing, record headless" version.
+- Updated `SKILL.md` to add:
   - audio-lock-first pacing
   - storyboard discipline / anti-wall-of-text guidance
   - contradiction checking before capture
   - review-mode vs capture-mode distinction
   - headless Playwright first, real-browser fallback when timing drifts
   - packaging expectations for thumbnail, captions, and upload copy
-- Added [`references/production-checklist.md`](/Users/secure/projects/study-film-skill/references/production-checklist.md) with the compact ship checklist proven out by Episode 3.
-- Updated [`README.md`](/Users/secure/projects/study-film-skill/README.md) so the public repo description reflects the real production pipeline.
-- Patched [`references/template.html`](/Users/secure/projects/study-film-skill/references/template.html) so the base template now supports:
+- Added `references/production-checklist.md` with the compact ship checklist used by the current workflow.
+- Updated `README.md` so the public repo description reflects the real production pipeline.
+- Patched `references/template.html` so the base template now supports:
   - `autoplay` class wiring
   - silent capture mode
   - optional narration review playback via `narration.mp3`
@@ -42,4 +42,4 @@ Observed local state:
 
 Next agent should not touch:
 - Do not revert `outputs/` or `.DS_Store` unless the user explicitly wants repo cleanup.
-- Treat `references/production-checklist.md` as the canonical Episode 3 lessons file unless a later film proves it wrong.
+- Treat `references/production-checklist.md` as the canonical workflow checklist unless a later revision proves it wrong.

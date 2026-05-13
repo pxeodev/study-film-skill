@@ -124,14 +124,14 @@ cropped or the frame reads like a wall of text, simplify it.
 
 ## Production Checklist
 
-For the workflow proven out on Episode 3, see
+For the current production checklist, see
 `references/production-checklist.md`.
 
 ## Customization
 
 ### Colors
 
-The film uses the Shumi study-film canon (single locked palette, no
+The film uses a single study-film canon (single locked palette, no
 parallel "cold terminal" sub-palette). To customize for a different
 brand, edit the canon tokens in `references/template.html` and
 `SKILL.md` §4 together — they must stay in sync.

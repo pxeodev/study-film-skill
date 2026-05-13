@@ -98,11 +98,9 @@ Write the narration as a separate script, generate the audio, and treat that aud
 
 ### 4. Color tokens
 
-The film uses the Shumi study-film canon. There is no parallel "cold
-terminal" palette — terminals live on the canonical surface ladder
-and use canonical tokens. Source of truth:
-`~/projects/studies/v2/site/CANON.md`. Executable gate:
-`~/projects/studies/scripts/film-palette-scan.sh`.
+The film uses a single study-film canon. There is no parallel "cold
+terminal" palette — terminals live on the same surface ladder and use
+the same canonical tokens throughout the piece.
 
 **Palette (canon — locked):**
 ```css
@@ -208,7 +206,7 @@ Optional YouTube deliverables:
 - `captions.en.vtt`
 - short description + pinned comment draft
 
-For the production checklist used on Episode 3, see
+For the production checklist that captures the current workflow, see
 `references/production-checklist.md`.
 
 ### 9. Privacy rules

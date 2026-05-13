@@ -1,6 +1,6 @@
 # Current State — study-film-skill
 
-- The skill now reflects the Episode 3 workflow: narration is the fixed clock, pacing is validated on the normal page, `?autoplay` is capture-only, and headless capture is no longer assumed to be sufficient.
+- The skill now reflects the current workflow: narration is the fixed clock, pacing is validated on the normal page, `?autoplay` is capture-only, and headless capture is no longer assumed to be sufficient.
 - The base template now has a real distinction between review mode and silent capture mode.
 - Packaging guidance now covers thumbnail safety, contradiction checks, and captions.
 
